@@ -1,25 +1,14 @@
 require 'unimidi'
 
-=begin
-SHEPARD_CONSTANTS = [
-  [60, 100, 48, 14],
-  [61, 99, 49, 18],
-  [62, 95, 50, 25],
-  [63, 88, 51, 33],
-  [64, 80, 52, 41],
-  [65, 71, 53, 51],
-  [66, 61, 54, 61],
-  [67, 51, 55, 71],
-  [68, 41, 56, 80],
-  [69, 33, 57, 88],
-  [70, 32,
-=end
-
 class MidiAdaptor
   def initialize
     @output = UniMIDI::Output.gets
   end
   def shutdown
+    24.times do |n|
+      shepard_off n
+    end
+
     @output.close
   end
   def note_on note, velocity
@@ -38,17 +27,23 @@ class MidiAdaptor
     note_off tones[0], tones[1]
     note_off tones[2], tones[3]
   end
+
+  CONST_C = 60.5
   def shepard_tone note 
+    if note < 0 or note > 23
+      raise "Invalid tone range"
+    end
+
     retval = []
     retval << 48 + note;
-    retval << (100 * Math::exp(-(((note - 12)**2)/72.0))).to_i
+    retval << (100 * Math::exp(-(((note - 12)**2)/CONST_C))).to_i
 
     if note < 12
       retval << 60 + note;
-      retval << (100 * Math::exp(-((note**2)/72.0))).to_i
+      retval << (100 * Math::exp(-((note**2)/CONST_C))).to_i
     else
       retval << 36 + note;
-      retval << (100 * Math::exp(-(((note - 24)**2)/72.0))).to_i
+      retval << (100 * Math::exp(-(((note - 24)**2)/CONST_C))).to_i
     end
     return retval
   end
