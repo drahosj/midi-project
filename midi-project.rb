@@ -48,3 +48,15 @@ class MidiAdaptor
     return retval
   end
 end
+
+def test_adaptor
+  adaptor = MidiAdaptor.new
+  
+  4.times do
+    24.times do |n|
+      adaptor.shepard_on n
+      sleep 0.35
+      adaptor.shepard_off n
+    end
+  end
+end
