@@ -29,7 +29,7 @@ class MidiAdaptor
     note_off tones[2], tones[3]
   end
 
-  CONST_C = 60.5
+  CONST_C = 55.5
   def shepard_tone note 
     if note < 0 or note > 23
       raise "Invalid tone range"
@@ -55,6 +55,7 @@ class MidiAdaptor
         shepard_on n
         sleep 0.35
         shepard_off n
+        sleep 0.055
       end
     end
   end
