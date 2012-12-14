@@ -1,3 +1,4 @@
+require 'bundler'
 require 'unimidi'
 
 class MidiAdaptor
