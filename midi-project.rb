@@ -29,7 +29,11 @@ class MidiAdaptor
     note_off tones[2], tones[3]
   end
 
-  CONST_C = 55.5
+  CONST_C = 8.0
+  def gauss_func x
+    return (95 * Math::exp(-((x/CONST_C)**2))).to_i - 8
+  end
+
   def shepard_tone note 
     if note < 0 or note > 23
       raise "Invalid tone range"
@@ -37,14 +41,14 @@ class MidiAdaptor
 
     retval = []
     retval << 48 + note;
-    retval << (100 * Math::exp(-(((note - 12)**2)/CONST_C))).to_i
+    retval << gauss_func(note - 12)
 
     if note < 12
       retval << 60 + note;
-      retval << (100 * Math::exp(-((note**2)/CONST_C))).to_i
+      retval << gauss_func(note)
     else
       retval << 36 + note;
-      retval << (100 * Math::exp(-(((note - 24)**2)/CONST_C))).to_i
+      retval << gauss_func(note - 24)
     end
     return retval
   end
