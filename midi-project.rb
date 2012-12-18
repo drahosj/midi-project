@@ -37,7 +37,7 @@ class MidiAdaptor
 
   def shepard_tone note 
     if note < 0 or note > 23
-      raise "Invalid tone range"
+      raise "Invalid tone range - #{note}"
     end
 
     retval = []
@@ -66,16 +66,75 @@ class MidiAdaptor
   end
 end
 
-class serial_adaptor
+class SerialAdaptor
   def initialize port
     @port = SerialPort.new port, 115200, 8, 1, SerialPort::NONE
+  end
+
+  def read_line
+    line = String.new
+    loop do
+      char = @port.getc
+      if char == "\n"
+        break
+      end
+      if char != nil
+        line << char
+      end
+    end
+    #puts "Read line: #{line}"
+    line.chomp!
+    return line.reverse!
+  end
+
+  def test
+    loop do
+      puts read_line
+    end
+  end
+
+  def shutdown
+    @port.close
+  end
 end
 
 if __FILE__ == $0
-  adaptor = MidiAdaptor.new
-  at_exit do
-    puts "Shutting down midi adaptor..."
-    adaptor.shutdown
+# adaptor = SerialAdaptor.new "/dev/ttyACM0"
+#  at_exit do
+#    puts "Shutting down adaptor..."
+#    adaptor.shutdown
+#  end
+#  adaptor.test
+  
+  @midi = MidiAdaptor.new
+  @serial = SerialAdaptor.new "/dev/ttyACM0"
+
+  @old_state = "111111111111111111111111"
+  @state = @old_state
+
+  loop do
+    @state =  @serial.read_line
+    puts @state.length
+    #puts "S #{@state}"
+    #puts "O #{@old_state}"
+    unless @state == @old_state
+      @state.length.times do |i|
+        unless @state[i] == @old_state[i]
+          if @state[i] == "0"
+            @midi.shepard_on i
+            puts "Sending NOTE_ON"
+          else
+            @midi.shepard_off i
+            puts "Sending NOTE_OFF"
+          end
+        end
+      end
+    end
+    @old_state = @state
   end
-  adaptor.test
+  at_exit do
+    puts "Shutting down..."
+    @midi.shutdown
+    @serial.shutdown
+  end
 end
