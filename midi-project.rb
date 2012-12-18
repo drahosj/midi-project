@@ -1,4 +1,5 @@
 require 'bundler'
+require 'serialport'
 require 'unimidi'
 
 class MidiAdaptor
@@ -63,6 +64,11 @@ class MidiAdaptor
       end
     end
   end
+end
+
+class serial_adaptor
+  def initialize port
+    @port = SerialPort.new port, 115200, 8, 1, SerialPort::NONE
 end
 
 if __FILE__ == $0
