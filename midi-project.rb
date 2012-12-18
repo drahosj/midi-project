@@ -82,7 +82,7 @@ class SerialAdaptor
         line << char
       end
     end
-    #puts "Read line: #{line}"
+    puts "Read line: #{line}"
     line.chomp!
     return line.reverse!
   end
@@ -115,8 +115,11 @@ if __FILE__ == $0
   loop do
     @state =  @serial.read_line
     puts @state.length
-    #puts "S #{@state}"
-    #puts "O #{@old_state}"
+    if @state.length == 23
+      @state << "0" #Fix the "leading zero" bug
+    end
+    puts "S #{@state}"
+    puts "O #{@old_state}"
     unless @state == @old_state
       @state.length.times do |i|
         unless @state[i] == @old_state[i]
